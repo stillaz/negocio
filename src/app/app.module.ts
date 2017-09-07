@@ -5,12 +5,20 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 import { StatusBar } from '@ionic-native/status-bar';
 
 import { MyApp } from './app.component';
-import { HomePage } from '../pages/home/home';
+import { ProductoProvider } from '../providers/producto/producto';
+import { InventarioProvider } from '../providers/inventario/inventario';
+import { VentaProvider } from '../providers/venta/venta';
+import { PersonaProvider } from '../providers/persona/persona';
+import { Printer } from '@ionic-native/printer';
+import { UsuarioProvider } from '../providers/usuario/usuario';
+import { ProveedorProvider } from '../providers/proveedor/proveedor';
+import { DbProvider } from '../providers/db/db';
+import { SQLite } from '@ionic-native/sqlite';
+import { Camera } from '@ionic-native/camera';
 
 @NgModule({
   declarations: [
-    MyApp,
-    HomePage
+    MyApp
   ],
   imports: [
     BrowserModule,
@@ -18,13 +26,22 @@ import { HomePage } from '../pages/home/home';
   ],
   bootstrap: [IonicApp],
   entryComponents: [
-    MyApp,
-    HomePage
+    MyApp
   ],
   providers: [
     StatusBar,
     SplashScreen,
-    {provide: ErrorHandler, useClass: IonicErrorHandler}
+    Printer,
+    SQLite,
+    {provide: ErrorHandler, useClass: IonicErrorHandler},
+    ProductoProvider,
+    InventarioProvider,
+    VentaProvider,
+    PersonaProvider,
+    UsuarioProvider,
+    ProveedorProvider,
+    DbProvider,
+    Camera
   ]
 })
 export class AppModule {}
