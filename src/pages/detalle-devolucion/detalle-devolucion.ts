@@ -215,9 +215,9 @@ export class DetalleDevolucionPage {
   }
 
   getProductos() {
-    this.productoServicio.getProductosGroupedColumnas(5).then((productos) => {
+    this.productoServicio.getProductosGruopedGrupo().then(productos => {
       this.productos = productos;
-    }).catch(err => alert('Error cargando productos'));
+    }).catch(err => alert("Error al cargar datos"));
   }
 
   calcularTotal() {
