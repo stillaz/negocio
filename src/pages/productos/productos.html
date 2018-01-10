@@ -56,14 +56,14 @@
     <ion-list>
       <button menuClose ion-item *ngFor="let p of pages" (click)="openPage(p)">
         {{p.title}}
-        <ion-badge *ngIf="p.badge > 0" color="danger">{{p.badge}}</ion-badge> 
+        <ion-badge *ngIf="p.badge > 0" color="danger">{{p.badge}}</ion-badge>
         <ion-icon name="{{p.icon}}" item-right></ion-icon>
       </button>
     </ion-list>
   </ion-content>
 </ion-menu>
 
-<ion-content padding [ngSwitch]="modo">
+<ion-content padding [ngSwitch]="modo" class="grid-full">
   <ion-list *ngIf="busqueda || filtro">
     <ion-item-sliding #item *ngFor="let producto of productos">
       <ion-item (click)="ver(producto)">
@@ -107,37 +107,21 @@
     </ion-list>
 
     <ion-list *ngSwitchCase="'dos'">
-      <ion-item-group *ngFor="let grupo of productos">
-        <ion-item-divider color="light">{{grupo.grupo}} </ion-item-divider>
-        <ion-grid>
-          <ion-row *ngFor="let fila of grupo.filas">
-            <ion-col #item *ngFor="let producto of fila">
-              <ion-card *ngIf="producto.idproducto">
-                <img *ngIf="producto.imagen" [src]="producto.imagen" (click)="ver(producto)">
-
-                <ion-card-content (click)="ver(producto)">
-                  <h2>{{producto.descripcion}} {{producto.marca}}</h2>
-                  <p>Precio: {{producto.precio| currency : 'usd' : true : '.0' }}</p>
-                  <ion-note item-end>{{producto.cantidad}}</ion-note>
-                </ion-card-content>
-
-                <ion-row>
-                  <ion-col>
-                    <button ion-button icon-left clear small color="secondary" (click)="precio(producto)">
-                      <ion-icon name="pricetag"></ion-icon>
-                      Precio
-                    </button>
-                  </ion-col>
-                </ion-row>
-              </ion-card>
-            </ion-col>
-          </ion-row>
-        </ion-grid>
+      <ion-item-group *ngFor="let item of productos">
+        <ion-item-divider color="light">{{item.grupo}}</ion-item-divider>
+        <ion-row>
+          <ion-col #item *ngFor="let producto of item.productos" class="cell-1" (click)="ver(producto)">
+            <img *ngIf="producto.imagen" [src]="producto.imagen" (click)="ver(producto)">
+            <strong>{{producto.descripcion}} {{producto.marca}}</strong>
+            <p>Precio: {{producto.precio| currency : 'usd' : true : '.0' }}</p>
+            <ion-note item-end>Disponible {{producto.cantidad}}</ion-note>
+          </ion-col>
+        </ion-row>
       </ion-item-group>
     </ion-list>
   </div>
 
-  <ion-fab center bottom>
+  <ion-fab *ngIf="!busqueda" center bottom>
     <button ion-fab (tap)="agregar()">
       <ion-icon name="add"></ion-icon>
     </button>

@@ -29,9 +29,9 @@ export class DetalleVentaPage {
   }
 
   getProductos() {
-    this.producto.getProductosGroupedColumnas(5).then((productos) => {
+    this.producto.getProductosGruopedGrupo().then(productos => {
       this.productos = productos;
-    }).catch(err => alert('Error cargando productos'));
+    }).catch(err => alert("Error al cargar datos"));
   }
 
   ionViewDidLoad() {

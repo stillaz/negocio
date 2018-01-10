@@ -23,7 +23,7 @@ export class DetalleCajaPage {
     this.cajaDetalle = this.navParams.data.listaPendienteCaja;
     this.total = 0;
     this.cajaDetalle.forEach(venta => {
-      this.total += venta.total < venta.pago ? (venta.pago - venta.devuelta) : venta.pago;
+      this.total = (venta.total < venta.pago) ? Number(this.total) + (Number(venta.pago) - Number(venta.devuelta)) : Number(this.total) + Number(venta.pago);
     });
     this.fechaCaja = this.navParams.data.fechaCaja;
   }
