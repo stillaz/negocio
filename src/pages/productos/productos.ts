@@ -27,7 +27,7 @@ export class ProductosPage {
   mostrarAlerta = true;
 
   pages: any[] = [
-    { title: 'Productos en alerta', component: '', icon: 'alert' },
+    { title: 'Productos en alerta', component: 'ListaProductosAlertaPage', icon: 'alert' },
     { title: 'Productos más vendidos', component: '', icon: 'trending-up' },
     { title: 'Productos menos vendidos', component: '', icon: 'trending-down' },
     { title: 'Histórico inventario', component: '', icon: 'list-box' }
@@ -50,6 +50,7 @@ export class ProductosPage {
     this.producto.getProductosAlerta().then(res => {
       this.events.publish('productos:alerta');
       this.alerta = res.length;
+      this.pages[0].badge = this.alerta;
       if(this.mostrarAlerta && this.alerta > 0){
         alert("Tienes productos en alerta en el inventario");
         this.mostrarAlerta = false;
