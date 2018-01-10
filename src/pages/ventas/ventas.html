@@ -10,7 +10,7 @@
   </ion-navbar>
   <h3>Total recibido: {{total| currency : 'usd' : true : '.0'}}</h3>
 
-  <button ion-button type="submit" icon-right full outline color="secondary" (click)="alertaCerrarCaja()">Cerrar caja
+  <button *ngIf="ventas.length > 0" ion-button type="submit" icon-right full outline color="secondary" (click)="alertaCerrarCaja()">Cerrar caja
     <ion-icon name="checkmark"></ion-icon>
   </button>
 </ion-header>
@@ -33,16 +33,12 @@
 </ion-menu>
 
 <ion-content padding>
-  <ion-list>
-    <ion-item *ngFor="let item of ventas">
-      <ion-label>
-        <h2>Venta No.: {{item.idventa}}</h2>
-        <p>Fecha de venta {{item.fecha|date: 'dd/MM/yyyy HH:mm'}}</p>
-        <p>Total venta {{item.total| currency : 'usd' : true : '.0' }} / Pagado {{item.pago| currency : 'usd' : true : '.0'}}
-          / Devuelto {{item.devuelta| currency : 'usd' : true : '.0' }} </p>
-        <p>Total recibido {{item.total
-          < item.pago ? item.pago - item.devuelta : item.pago| currency : 'usd' : true : '.0'}} </p>
-      </ion-label>
+  <ion-list *ngFor="let item of ventas">
+    <ion-item>
+      <h2>Venta No.: {{item.idventa}}</h2>
+      <p>Fecha de venta {{item.fecha|date: 'dd/MM/yyyy HH:mm'}}</p>
+      <p>Total venta {{item.total| currency : 'usd' : true : '.0' }} / Pagado {{item.pago| currency : 'usd' : true : '.0'}} / Devuelto {{item.devuelta| currency : 'usd' : true : '.0' }} </p>
+      <p>Total recibido {{item.total < item.pago ? item.pago - item.devuelta : item.pago| currency : 'usd' : true : '.0'}} </p>
     </ion-item>
   </ion-list>
 
