@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, PopoverController, AlertController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, PopoverController, AlertController, Events } from 'ionic-angular';
 import { VentaProvider } from '../../providers/venta/venta';
 import { CajaProvider } from '../../providers/caja/caja';
 import * as moment from 'moment';
@@ -19,7 +19,7 @@ export class VentasPage {
 
   ventas;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public venta: VentaProvider, public popoverCtrl: PopoverController, private cajaService: CajaProvider, public alertCtrl: AlertController) {
+  constructor(public navCtrl: NavController, public navParams: NavParams, public venta: VentaProvider, public popoverCtrl: PopoverController, private cajaService: CajaProvider, public alertCtrl: AlertController, public events: Events) {
   }
 
   ionViewDidLoad() {
@@ -30,6 +30,7 @@ export class VentasPage {
     this.navCtrl.push('DetalleVentaPage');
     this.navCtrl.viewWillUnload.subscribe(() => {
       this.getVentas();
+      this.events.publish('productos:alerta');
     });
   }
 
@@ -76,11 +77,6 @@ export class VentasPage {
           listaPendienteCerrar.push(venta);
           if (tipo === 'day') {
             cierrePendiente = 'cerrar';
-          } else {
-            let diaHoy = moment(new Date()).add(-1, 'day');
-            if (moment(diaHoy).startOf('day').isAfter(venta.fecha, 'day')) {
-              cierrePendiente = 'ver';
-            }
           }
         }
       }
@@ -108,13 +104,6 @@ export class VentasPage {
 
   irCierreCaja(ventas) {
     this.navCtrl.push('DetalleCajaPage', { listaPendienteCaja: ventas.cierre, fechaCaja: ventas.fechaCaja });
-    this.navCtrl.viewWillUnload.subscribe(() => {
-      this.getVentas();
-    });
-  }
-
-  irCajasAbiertas() {
-    this.navCtrl.push('CajaPage');
     this.navCtrl.viewWillUnload.subscribe(() => {
       this.getVentas();
     });

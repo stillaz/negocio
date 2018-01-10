@@ -16,8 +16,7 @@ export class MenuVentasPage {
 
   pages: any[] = [
     { title: 'Pagos', component: 'PagosPage', icon: '' },
-    { title: 'Devoluciones', component: 'DevolucionesPage', icon: '' },
-    { title: 'Caja', component: 'CajaPage', icon: '' },
+    { title: 'Devoluciones', component: 'DevolucionesPage', icon: '' }
   ];
 
   constructor(public viewCtrl: ViewController, public navCtrl: NavController) {

@@ -135,7 +135,7 @@ export class DetalleProductoPage {
           handler: () => {
             this.producto.existsProducto(producto).then(res =>{
               if(res){
-                this.todo.patchValue({activo: false});
+                producto.activo = false;
                 this.producto.update(producto).then(res => {
                   let toast = this.toastCtrl.create({
                     message: 'El producto ha sido eliminado',

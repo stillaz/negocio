@@ -180,4 +180,17 @@ export class ProductoProvider {
       return Promise.resolve();
     }).catch(err => Promise.reject(err));
   }
+
+  getProductosAlerta(){
+    let sql = "select * from producto p where p.activo = 'true' and alerta > 0 and p.cantidad <= p.alerta";
+    let items = [];
+    return this.db.ejecutar(sql, {})
+    .then((res) => {
+      for(var i = 0; i < res.rows.length; i++){
+        items.push(res.rows.item(i));
+      }
+      return Promise.resolve(items);
+    })
+    .catch(err => Promise.reject(err));
+  }
 }

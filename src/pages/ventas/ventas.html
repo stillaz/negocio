@@ -27,7 +27,6 @@
         <p>Total {{item.totalVentas| currency : 'usd' : true : '.0' }}</p>
       </ion-label>
       <button ion-button item-end color="secondary" *ngIf="item.cerrar === 'cerrar'" (click)=irCierreCaja(item)>Cerrar caja</button>
-      <button ion-button item-end color="danger" *ngIf="item.cerrar === 'ver'">Ver cajas abiertas</button>
     </ion-item>    
   </ion-list>
 

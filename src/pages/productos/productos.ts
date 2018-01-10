@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, ModalController, PopoverController, ActionSheetController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, ModalController, PopoverController, ActionSheetController, Events } from 'ionic-angular';
 import { ProductoProvider } from '../../providers/producto/producto';
 
 /**
@@ -23,6 +23,8 @@ export class ProductosPage {
   filtro: string;
   gruposeleccion: string;
   marcaseleccion: string;
+  alerta: number;
+  mostrarAlerta = true;
 
   pages: any[] = [
     { title: 'Productos en alerta', component: '', icon: 'alert' },
@@ -31,7 +33,7 @@ export class ProductosPage {
     { title: 'Histórico inventario', component: '', icon: 'list-box' }
   ];
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public producto: ProductoProvider, public modalCtrl: ModalController, public popoverCtrl: PopoverController, public actionSheetCtrl: ActionSheetController) {
+  constructor(public navCtrl: NavController, public navParams: NavParams, public producto: ProductoProvider, public modalCtrl: ModalController, public popoverCtrl: PopoverController, public actionSheetCtrl: ActionSheetController, public events: Events) {
   }
 
   getProductos(){
@@ -44,6 +46,15 @@ export class ProductosPage {
         this.productos = productos;
       }).catch(err => alert("Error al cargar datos"));
     }
+
+    this.producto.getProductosAlerta().then(res => {
+      this.events.publish('productos:alerta');
+      this.alerta = res.length;
+      if(this.mostrarAlerta && this.alerta > 0){
+        alert("Tienes productos en alerta en el inventario");
+        this.mostrarAlerta = false;
+      }
+    });
   }
 
   agregar(){
@@ -151,6 +162,10 @@ export class ProductosPage {
       });
       actionSheet.present();
     });
+  }
+
+  irAlertas(){
+    this.navCtrl.push('ListaProductosAlertaPage');
   }
 
 }
