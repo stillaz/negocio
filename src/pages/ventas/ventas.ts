@@ -18,11 +18,18 @@ import * as moment from 'moment';
 export class VentasPage {
 
   ventas;
+  total: number;
+  fechaCaja: Date;
+
+  pages: any[] = [
+    { title: 'Historial de ventas', component: 'ListaVentasPage', icon: 'stats' }
+  ];
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public venta: VentaProvider, public popoverCtrl: PopoverController, private cajaService: CajaProvider, public alertCtrl: AlertController, public events: Events) {
   }
 
-  ionViewDidLoad() {
+  ionViewDidLoad(){
+    this.fechaCaja = new Date();
     this.getVentas();
   }
 
@@ -35,78 +42,15 @@ export class VentasPage {
   }
 
   getVentas() {
-    let items = [];
-    let actual = moment(new Date);
-    this.venta.getVentas().then(ventas => {
-      let anterior = moment(actual).add(-1, 'day');
-      items.push(this.getVentasBy(ventas, actual, 'day', 11));
-      items.push(this.getVentasBy(ventas, anterior, 'day', 12));
-
-      anterior = moment(actual).add(-1, 'week');
-      items.push(this.getVentasBy(ventas, actual, 'week', 21));
-      items.push(this.getVentasBy(ventas, anterior, 'week', 22));
-
-      anterior = moment(actual).add(-1, 'month');
-      items.push(this.getVentasBy(ventas, actual, 'month', 31));
-      items.push(this.getVentasBy(ventas, anterior, 'month', 32));
-
-      anterior = moment(actual).add(-1, 'year');
-      items.push(this.getVentasBy(ventas, actual, 'year', 41));
-      items.push(this.getVentasBy(ventas, anterior, 'year', 42));
-
-      this.ventas = items;
+    this.total = 0;
+    let inicial = moment(this.fechaCaja).startOf('day');
+    let final = moment(this.fechaCaja).endOf('day');
+    this.venta.getVentasByUsuarioFecha(inicial.toDate(), final.toDate()).then(ventas => {
+      ventas.forEach(venta => {
+        this.total = (venta.total < venta.pago) ? Number(this.total) + (Number(venta.pago) - Number(venta.devuelta)) : Number(this.total) + Number(venta.pago);
+      });
+      this.ventas = ventas;
     }).catch(err => alert("Error cargando ventas"));
-  }
-
-  getVentasBy(ventas: any, fecha: moment.Moment, tipo, id: number): any {
-    let contador: number = 0;
-    let total: number = 0;
-    let texto: string;
-    let inicial = moment(fecha).startOf(tipo);
-    let final = moment(fecha).endOf(tipo);
-    let diferencia = moment(new Date()).diff(fecha, tipo);
-    let cierrePendiente = '';
-    let listaVentas = [];
-    let listaPendienteCerrar = [];
-    ventas.forEach(venta => {
-      if (inicial.isSameOrAfter(venta.fecha, tipo) && final.isSameOrBefore(venta.fecha, tipo)) {
-        total += venta.total;
-        contador++;
-        listaVentas.push(venta);
-        if (venta.cerrada !== 'true') {
-          listaPendienteCerrar.push(venta);
-          if (tipo === 'day') {
-            cierrePendiente = 'cerrar';
-          }
-        }
-      }
-
-      switch (tipo) {
-        case 'day':
-          texto = diferencia == 0 ? 'hoy' : diferencia == 1 ? 'ayer' : 'hace ' + diferencia + ' días';
-          break;
-
-        case 'week':
-          texto = diferencia == 0 ? 'esta semana' : diferencia == 1 ? 'semana anterior' : 'hace ' + diferencia + ' semanas';
-          break;
-
-        case 'month':
-          texto = diferencia == 0 ? 'este mes' : diferencia == 1 ? 'mes anterior' : 'hace ' + diferencia + ' meses';
-          break;
-
-        case 'year':
-          texto = diferencia == 0 ? 'este año' : diferencia == 1 ? 'año anterior' : 'hace ' + diferencia + ' años';
-          break;
-      }
-    });
-    return { id: id, ventas: contador, totalVentas: total, fecha: texto, cerrar: cierrePendiente, detalle: listaVentas, cierre: listaPendienteCerrar, fechaCaja: fecha.toDate() };
-  }
-
-  irCierreCaja(ventas) {
-    this.navCtrl.push('DetalleCajaPage', { listaPendienteCaja: ventas.cierre, fechaCaja: ventas.fechaCaja });
-    this.navCtrl.viewWillUnload.subscribe(() => {
-      this.getVentas();
-    });
   }
 
   menu(myEvent) {
@@ -117,6 +61,79 @@ export class VentasPage {
     popover.present({
       ev: myEvent
     });
+  }
+
+  openPage(page) {
+    this.navCtrl.push(page.component);
+  }
+
+  alertaCerrarCaja() {
+    let caja: any = {};
+    let total = this.total.toLocaleString('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0
+    });
+
+    let fechaCaja = this.fechaCaja.toLocaleString();
+
+    let prompt = this.alertCtrl.create({
+      title: 'Caja ' + fechaCaja,
+      message: "Total: " + total,
+      inputs: [
+        {
+          label: 'Paga',
+          name: 'pago',
+          placeholder: '$ 0',
+          type: 'number'
+        },
+      ],
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: 'Guardar',
+          handler: data => {
+            caja.fecha = this.fechaCaja;
+            caja.totalcaja = this.total;
+            caja.pago = data.pago;
+            caja.fechaCierre = new Date();
+            caja.diferencia = data.pago - caja.totalcaja;
+            caja.idusuario = 0;
+            caja.listaVentas = this.ventas;
+            let diferenciaText = caja.diferencia.toLocaleString('en-US', {
+              style: 'currency',
+              currency: 'USD',
+              minimumFractionDigits: 0
+            });
+            let mensaje = caja.diferencia === 0 ? "" : caja.diferencia > 0 ? "La caja tiene un valor superior de " + diferenciaText : "La caja tiene un valor negativo de " + diferenciaText;
+            if (mensaje === "") {
+              this.cajaService.create(caja);
+            } else {
+              let alert = this.alertCtrl.create({
+                title: 'Caja descuadrada',
+                subTitle: mensaje,
+                message: 'Desea continuar',
+                buttons: [{
+                  text: 'Si',
+                  handler: () => {
+                    this.cajaService.create(caja);
+                  },
+                },
+                {
+                  text: 'No',
+                  role: 'cancel'
+                }]
+              });
+              alert.present();
+            }
+          }
+        }
+      ]
+    });
+    prompt.present();
   }
 
 }

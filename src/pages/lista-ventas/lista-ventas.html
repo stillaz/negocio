@@ -1,18 +1,22 @@
 <!--
-  Generated template for the ListaVentasPage page.
+  Generated template for the VentasPage page.
 
   See http://ionicframework.com/docs/components/#navigation for more info on
   Ionic pages and navigation.
 -->
 <ion-header>
-
   <ion-navbar>
-    <ion-title>lista-ventas</ion-title>
+    <ion-title>Historial ventas</ion-title>
   </ion-navbar>
-
 </ion-header>
 
-
 <ion-content padding>
-
+  <ion-list>
+    <ion-item *ngFor="let item of ventas">
+      <ion-label>
+        <h2>Ventas de {{item.fecha}}: {{item.ventas}}</h2>
+        <p>Total {{item.totalVentas| currency : 'usd' : true : '.0' }}</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
 </ion-content>

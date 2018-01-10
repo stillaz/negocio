@@ -1,13 +1,6 @@
-<!--
-  Generated template for the VentasPage page.
-
-  See http://ionicframework.com/docs/components/#navigation for more info on
-  Ionic pages and navigation.
--->
 <ion-header>
-
   <ion-navbar>
-    <ion-title>Ventas</ion-title>
+    <ion-title>Ventas de {{fechaCaja|date: 'dd/MM/yyyy'}}</ion-title>
 
     <ion-buttons end>
       <button ion-button icon-only (click)="menu($event)">
@@ -15,22 +8,49 @@
       </button>
     </ion-buttons>
   </ion-navbar>
+  <h3>Total recibido: {{total| currency : 'usd' : true : '.0'}}</h3>
 
+  <button ion-button type="submit" icon-right full outline color="secondary" (click)="alertaCerrarCaja()">Cerrar caja
+    <ion-icon name="checkmark"></ion-icon>
+  </button>
 </ion-header>
 
+<ion-menu [content]="content">
+  <ion-header>
+    <ion-toolbar>
+      <ion-title>Opciones</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-content>
+    <ion-list>
+      <button menuClose ion-item *ngFor="let p of pages" (click)="openPage(p)">
+        {{p.title}}
+        <ion-icon name="{{p.icon}}" item-right></ion-icon>
+      </button>
+    </ion-list>
+  </ion-content>
+</ion-menu>
 
 <ion-content padding>
   <ion-list>
     <ion-item *ngFor="let item of ventas">
       <ion-label>
-        <h2>Ventas de {{item.fecha}}: {{item.ventas}}</h2>
-        <p>Total {{item.totalVentas| currency : 'usd' : true : '.0' }}</p>
+        <h2>Venta No.: {{item.idventa}}</h2>
+        <p>Fecha de venta {{item.fecha|date: 'dd/MM/yyyy HH:mm'}}</p>
+        <p>Total venta {{item.total| currency : 'usd' : true : '.0' }} / Pagado {{item.pago| currency : 'usd' : true : '.0'}}
+          / Devuelto {{item.devuelta| currency : 'usd' : true : '.0' }} </p>
+        <p>Total recibido {{item.total
+          < item.pago ? item.pago - item.devuelta : item.pago| currency : 'usd' : true : '.0'}} </p>
       </ion-label>
-      <button ion-button item-end color="secondary" *ngIf="item.cerrar === 'cerrar'" (click)=irCierreCaja(item)>Cerrar caja</button>
-    </ion-item>    
+    </ion-item>
   </ion-list>
 
   <ion-fab center bottom>
-    <button ion-fab (tap)="nuevo()"><ion-icon name="add"></ion-icon></button>
+    <button ion-fab (tap)="nuevo()">
+      <ion-icon name="add"></ion-icon>
+    </button>
   </ion-fab>
 </ion-content>
+
+<ion-nav #content></ion-nav>

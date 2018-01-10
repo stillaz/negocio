@@ -15,10 +15,10 @@ export class VentaProvider {
   constructor(public db: DbProvider) {
   }
 
-  getVentasByUsuarioFecha(idusuario, fechaInicio: Date, fechaFin: Date){
+  getVentasByUsuarioFecha(fechaInicio: Date, fechaFin: Date){
     let items = [];
-    let sql = "select * from venta where idusuario = ? and fecha between ? and ?";
-    return this.db.ejecutar(sql, [idusuario, fechaInicio, fechaFin]).then(res => {
+    let sql = "select * from venta where fecha between ? and ?";
+    return this.db.ejecutar(sql, [fechaInicio, fechaFin]).then(res => {
       for(var i = 0; i < res.rows.length; i++){
         items.push(res.rows.item(i));
       }
