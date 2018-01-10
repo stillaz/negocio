@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, ViewController } from 'ionic-angular';
+import { IonicPage, ViewController, NavController } from 'ionic-angular';
 
 /**
  * Generated class for the MenuProductosPage page.
@@ -14,15 +14,22 @@ import { IonicPage, ViewController } from 'ionic-angular';
 })
 export class MenuProductosPage {
 
-  constructor(public viewCtrl: ViewController) {
+  pages: any[] = [
+    { title: 'Inventario', component: 'InventarioPage', icon: 'alert' }
+  ];
+
+  constructor(public viewCtrl: ViewController, public navCtrl: NavController) {
   }
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad MenuProductosPage');
   }
 
-  close() {
-    this.viewCtrl.dismiss();
+  openPage(page) {
+    this.navCtrl.push(page.component);
+    this.navCtrl.viewWillUnload.subscribe(() =>{
+      this.viewCtrl.dismiss();
+    });
   }
 
 }

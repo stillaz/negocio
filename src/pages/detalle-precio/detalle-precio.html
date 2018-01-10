@@ -7,7 +7,7 @@
 <ion-header>
 
   <ion-navbar>
-    <ion-title>Modificar precio de producto {{producto.descripcion}}</ion-title>
+    <ion-title>Precio de producto</ion-title>
     <ion-buttons start>
       <button ion-button (click)="cerrar()">
         <ion-icon name="md-close"></ion-icon>
@@ -20,32 +20,46 @@
 
 <ion-content padding>
   <ion-card>
+    <ion-title>{{producto.descripcion}} {{producto.marca}}</ion-title>
+    
     <ion-card-content>
-        <img src="https://www.w3schools.com/css/paris.jpg" >
-        <ion-item>
-          <ion-label floating>Marca:</ion-label>
-          <ion-input type="text" [(ngModel)]="producto.marca" disabled="!editar"></ion-input>
+        <img *ngIf="producto.imagen" [src]="producto.imagen">
 
-          <ion-label floating>Grupo:</ion-label>
-          <ion-input type="text" [(ngModel)]="producto.grupo" disabled="!editar"></ion-input>
+        <ion-item>
+          <ion-label floating>Precio actual:</ion-label>
+          <ion-input type="number" [(ngModel)]="producto.precioanterior" disabled="!editar"></ion-input>
         </ion-item>
 
         <ion-item>
-          <ion-label floating>Precio:</ion-label>
-          <ion-input type="number" [(ngModel)]="producto.precio" disabled="!editar"></ion-input>
+            <ion-label floating>Precio actual:</ion-label>
+            <ion-select [(ngModel)]="modo" (ionChange)="seleccionar()">
+              <ion-option value="uno">Modificar precio</ion-option>
+              <ion-option value="dos">Aplicar descuento</ion-option>
+            </ion-select>
         </ion-item>
 
-        <ion-item>
-          <ion-label floating>Cambio de precio:</ion-label>
-          <ion-input type="number" [(ngModel)]="porcentaje"></ion-input>
-        </ion-item>
+        <div [ngSwitch]="modo">
+          <ion-item *ngSwitchCase="'uno'">
+            <ion-label floating>Nuevo precio:</ion-label>
+            <ion-input type="number" min="0" [(ngModel)]="producto.precio"></ion-input>
+          </ion-item>
 
-        <ion-item>
-          <ion-label floating>Descuento de:</ion-label>
-          <ion-input type="number" [(ngModel)]="producto.descuento"></ion-input>
-        </ion-item>
+          <div *ngSwitchCase="'dos'">
+            <ion-item>
+              <ion-label floating>% Descuento de:</ion-label>
+              <ion-input type="number" [(ngModel)]="producto.descuento"></ion-input>
+            </ion-item>
 
-        <button ion-button type="submit" block>Guardar</button>
+            <ion-item>
+              <ion-label floating>Descuento hasta:</ion-label>
+              <ion-datetime [min] ="minima" [max]="maxima" displayFormat="DD/MM/YYYY" [(ngModel)]="producto.fechaFin"></ion-datetime>
+            </ion-item>
+          </div>
+        </div>
     </ion-card-content>
+
+    <button ion-button type="submit" icon-right full large color="secondary" (click)="guardar()">Guardar
+      <ion-icon name="checkmark"></ion-icon>
+    </button>
   </ion-card>
 </ion-content>

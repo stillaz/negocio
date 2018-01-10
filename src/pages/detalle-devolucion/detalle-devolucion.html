@@ -1,0 +1,188 @@
+<!--
+  Generated template for the DetalleVentaPage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+  <ion-navbar>
+    <ion-title>Devolución {{datosDevolucion.iddevolucion}}
+    </ion-title>
+  </ion-navbar>
+  
+  <ion-toolbar>    
+    <ion-item>
+      <ion-label>Identificación cliente</ion-label>
+      <ion-input type="number" [(ngModel)]="idpersona" [disabled]="datosDevolucion.tipo"></ion-input>
+    </ion-item>
+
+    <ion-item *ngIf="producto">
+      <ion-label>Producto</ion-label>
+      <ion-input type="text" [(ngModel)]="producto.descripcion" [disabled]="datosDevolucion.tipo"></ion-input>
+    </ion-item>
+    
+    <button *ngIf="idpersona && producto && !datosDevolucion.tipo" ion-button icon-right small full (click)="seleccionar()">
+      <ion-icon name="arrow-forward"></ion-icon>
+    </button>
+
+    <ion-searchbar [(ngModel)]="busqueda" (ionInput)="filtrar()"></ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+    
+    
+<ion-content padding>
+  <ion-list *ngIf="busqueda && !datosDevolucion.tipo">
+    <ion-item *ngFor="let producto of productos" (click)="obtener(producto)">
+      <ion-thumbnail item-start>
+        <img *ngIf="producto.imagen" [src]="producto.imagen">
+      </ion-thumbnail>
+      <p>{{producto.descripcion}} {{producto.marca}}</p>
+      <p>Precio: {{producto.precio | currency : 'usd' : true : '.0' }}</p>
+      <ion-note item-end>{{producto.cantidad}}</ion-note>
+    </ion-item>
+  </ion-list>
+
+  <ion-row *ngIf="datosDevolucion.tipo == 'uno'">
+    <ion-col col-8>
+      <ion-scroll scrollY="true" style="height: 400px">
+        <ion-list *ngIf="!busqueda">
+          <ion-item-group *ngFor="let grupo of productos">
+            <ion-item-divider color="light">{{grupo.grupo}} </ion-item-divider>
+              <ion-grid no-padding>
+                <ion-row *ngFor="let fila of grupo.filas" justify-content-start>
+                  <ion-col #item *ngFor="let producto of fila" no-padding left>
+                    <ion-card no-padding>
+                      <div *ngIf="producto.idproducto">
+                        <img *ngIf="producto.imagen" [src]="producto.imagen" >
+                        <ion-card-content>
+                          <h2>{{producto.descripcion}} {{producto.marca}}</h2>
+                          <p>Precio: {{producto.precio| currency : 'usd' : true : '.0' }}</p>
+                          <ion-note item-end>{{producto.cantidad}}</ion-note>
+                        </ion-card-content>
+
+                        <ion-fab *ngIf="producto.cantidad > 0" right bottom>
+                          <button ion-fab mini (tap)="agregar(producto)"><ion-icon name="add"></ion-icon></button>
+                        </ion-fab>
+                      </div>
+                    </ion-card>
+                  </ion-col>
+                </ion-row>
+              </ion-grid>
+          </ion-item-group>
+        </ion-list>
+
+        <ion-list *ngIf="busqueda">
+          <ion-grid>
+            <ion-row no-padding left>
+              <ion-col col-3 *ngFor="let producto of productos" no-padding left>
+                <ion-card>
+                  <div *ngIf="producto.idproducto">
+                    <img *ngIf="producto.imagen" [src]="producto.imagen" >
+                    <ion-card-content>
+                      <h2>{{producto.descripcion}} {{producto.marca}}</h2>
+                      <p>Precio: {{producto.precio | currency : 'usd' : true : '.0' }}</p>
+                      <ion-note item-end>{{producto.cantidad}}</ion-note>
+                    </ion-card-content>
+
+                    <ion-fab *ngIf="producto.cantidad > 0" right bottom>
+                      <button ion-fab mini (tap)="agregar(producto)"><ion-icon name="add"></ion-icon></button>
+                    </ion-fab>
+                  </div>
+                </ion-card>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </ion-list>
+      </ion-scroll>
+    </ion-col>
+
+    <ion-col col-4>
+      <ion-title>
+        Lista de productos
+      </ion-title>
+
+      <ion-grid>
+        <ion-row>
+          <ion-col>
+            Producto
+          </ion-col>
+          
+          <ion-col>
+            Cantidad
+          </ion-col>
+
+          <ion-col>
+            Precio
+          </ion-col>
+
+          <ion-col>
+            Subtotal
+          </ion-col>
+
+          <ion-col>
+          </ion-col>
+        </ion-row>
+
+        <ion-list>
+          <ion-row #item *ngFor="let productos of carrito; let i = index">
+            <ion-col>
+              {{productos.producto.descripcion}} {{productos.producto.marca}}
+            </ion-col>
+
+            <ion-col>
+              {{productos.cantidad}}
+            </ion-col>
+
+            <ion-col>
+              {{productos.producto.precio | currency : 'usd' : true : '.0'}}
+            </ion-col>
+
+            <ion-col>
+              {{productos.total | currency : 'usd' : true : '.0'}}
+            </ion-col>
+
+            <ion-col>
+              <button ion-button color="danger" (click)="borrar(i)">
+                <ion-icon name="trash"></ion-icon>
+              </button>
+            </ion-col>
+          </ion-row>
+
+          <ion-row>
+            <ion-col>
+              Total cambio
+            </ion-col>
+
+            <ion-col>
+              {{datosDevolucion.total_devolucion_detalle | currency : 'usd' : true : '.0'}}
+            </ion-col>
+          </ion-row>
+
+          <ion-row>
+            <ion-col>
+              Total devolución
+            </ion-col>
+
+            <ion-col>
+              {{datosDevolucion.total_devolucion | currency : 'usd' : true : '.0'}}
+            </ion-col>
+          </ion-row>
+
+          <ion-row>
+            <ion-col>
+              Cambio
+            </ion-col>
+
+            <ion-col>
+              {{datosDevolucion.devuelta | currency : 'usd' : true : '.0'}}
+            </ion-col>
+          </ion-row>
+        </ion-list>
+      </ion-grid>
+
+      <button ion-button type="submit" block (click)="guardar()">Finalizar</button>
+      <button ion-button color="danger" block (click)="cancel()">Cancelar</button>
+    </ion-col>
+  </ion-row>
+</ion-content>
+    

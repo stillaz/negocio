@@ -15,10 +15,14 @@ import { ProveedorProvider } from '../providers/proveedor/proveedor';
 import { DbProvider } from '../providers/db/db';
 import { SQLite } from '@ionic-native/sqlite';
 import { Camera } from '@ionic-native/camera';
+import { ProductoPrecioProvider } from '../providers/producto-precio/producto-precio';
+import { DevolucionProvider } from '../providers/devolucion/devolucion';
+import { CreditoProvider } from '../providers/credito/credito';
+import { CajaProvider } from '../providers/caja/caja';
 
 @NgModule({
   declarations: [
-    MyApp
+    MyApp,
   ],
   imports: [
     BrowserModule,
@@ -41,7 +45,12 @@ import { Camera } from '@ionic-native/camera';
     UsuarioProvider,
     ProveedorProvider,
     DbProvider,
-    Camera
+    Camera,
+    ProductoPrecioProvider,
+    DevolucionProvider,
+    DevolucionProvider,
+    CreditoProvider,
+    CajaProvider
   ]
 })
 export class AppModule {}

@@ -1,0 +1,32 @@
+<!--
+  Generated template for the DetalleCajaPage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+  <ion-navbar>
+    <ion-title>Caja {{fechaCaja|date: 'dd/MM/yyyy'}}</ion-title>
+  </ion-navbar>
+    <h2>Total caja: {{total| currency : 'usd' : true : '.0'}}</h2>
+</ion-header>
+
+
+<ion-content padding>
+  <ion-list>
+    <ion-item *ngFor="let item of cajaDetalle">
+      <ion-label>
+        <h2>Venta No.: {{item.idventa}}</h2>
+        <p>Fecha de venta {{item.fecha|date: 'dd/MM/yyyy HH:mm'}}</p>
+        <p>Total venta {{item.total| currency : 'usd' : true : '.0' }} / Pagado {{item.pago| currency : 'usd' : true : '.0' }} / Devuelto {{item.devuelta| currency : 'usd' : true : '.0' }} </p>
+        <p>Total recibido {{item.total < item.pago ? item.pago - item.devuelta : item.pago| currency : 'usd' : true : '.0'}} </p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+</ion-content>
+
+<ion-footer>
+    <button ion-button type="submit" icon-right full large color="secondary" (click)="alertaCerrarCaja()">Cerrar caja
+      <ion-icon name="checkmark"></ion-icon>
+    </button>
+</ion-footer>

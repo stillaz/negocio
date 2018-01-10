@@ -7,151 +7,147 @@
 <ion-header>
 
   <ion-navbar>
-    <ion-title>Venta</ion-title>
+    <ion-title>Venta {{datosVenta.idventa}}
+      <br/>
+      Cliente: {{datosVenta.idpersona}} {{datosVenta.nombre}}
+
+      <button *ngIf="datosVenta.idpersona" ion-button small item-end color="danger" (click)="ver()">
+        <ion-icon name="close"></ion-icon>
+      </button>
+
+      <button *ngIf="!datosVenta.idpersona" ion-button small item-end (click)="ver()">
+        <ion-icon name="arrow-round-forward"></ion-icon>
+      </button>
+    </ion-title>
   </ion-navbar>
 
+  <ion-toolbar>
+    <ion-searchbar [(ngModel)]="busqueda" (ionInput)="filtrar()"></ion-searchbar>
+  </ion-toolbar>
 </ion-header>
 
 
-<ion-content padding>  
-  <ion-card>
-    <ion-card-content>
-      <ion-item>
-        <h2>Venta {{nroVenta}}</h2>
-        Fecha: {{fecha | date:'dd/MM/yyyy HH:mm'}}
-      </ion-item>
-
-      <ion-item>
-        <ion-label floating>Cliente:</ion-label>
-        <ion-input type="number" [(ngModel)]="datosVenta.idCliente" disabled="true"></ion-input>
-      </ion-item>
-
-      <button *ngIf="editar" ion-button type="submit" block>Guardar</button>
-    </ion-card-content>
-  </ion-card>
-
-  <ion-grid>
-    <ion-row>
-      <ion-col col-8>
-        <ion-searchbar  [(ngModel)]="busqueda" (ionInput)="productosFiltrados()"></ion-searchbar>
-
+<ion-content padding>
+  <ion-row>
+    <ion-col col-8>
+      <ion-scroll scrollY="true" style="height: 400px">
         <ion-list *ngIf="!busqueda">
-          <ion-scroll scrollY="true" style="height: 400px">
-            <ion-item-group *ngFor="let grupo of productos">
-              <ion-item-divider color="light">{{grupo.grupo}} </ion-item-divider>
-                <ion-grid>
-                  <ion-row *ngFor="let fila of grupo.filas">
-                    <ion-col #item *ngFor="let producto of fila">
-                        <ion-card *ngIf="producto.idproducto">
-                          <img src="{{producto.imagen}}" >
-                          <ion-card-content>
-                              <h2>{{producto.descripcion}} {{producto.marca}}</h2>
-                              <p>Precio: {{producto.precio| currency : 'usd' : true : '.0' }}</p>
-                              <ion-note item-end>{{producto.cantidad}}</ion-note>
-                          </ion-card-content>
+          <ion-item-group *ngFor="let grupo of productos">
+            <ion-item-divider color="light">{{grupo.grupo}} </ion-item-divider>
+              <ion-grid no-padding>
+                <ion-row *ngFor="let fila of grupo.filas" justify-content-start>
+                  <ion-col #item *ngFor="let producto of fila" no-padding left>
+                    <ion-card no-padding>
+                      <div *ngIf="producto.idproducto">
+                        <img *ngIf="producto.imagen" [src]="producto.imagen" >
+                        <ion-card-content>
+                          <h2>{{producto.descripcion}} {{producto.marca}}</h2>
+                          <p>Precio: {{producto.precio| currency : 'usd' : true : '.0' }}</p>
+                          <ion-note item-end>{{producto.cantidad}}</ion-note>
+                        </ion-card-content>
 
-                          <ion-fab right bottom>
-                              <button ion-fab mini (tap)="agregar(producto)"><ion-icon name="add"></ion-icon></button>
-                          </ion-fab>
-                        </ion-card>
-                    </ion-col>
-                  </ion-row>
-                </ion-grid>
-            </ion-item-group>
-          </ion-scroll>
+                        <ion-fab *ngIf="producto.cantidad > 0" right bottom>
+                          <button ion-fab mini (tap)="agregar(producto)"><ion-icon name="add"></ion-icon></button>
+                        </ion-fab>
+                      </div>
+                    </ion-card>
+                  </ion-col>
+                </ion-row>
+              </ion-grid>
+          </ion-item-group>
         </ion-list>
 
         <ion-list *ngIf="busqueda">
-            <ion-scroll scrollY="true" style="height: 400px">
-                  <ion-grid>
-                    <ion-row *ngFor="let producto of productos">
-                      <ion-col col-3>
-                          <ion-card *ngIf="producto.idproducto">
-                            <img src="{{producto.imagen}}" >
-                            <ion-card-content>
-                                <h2>{{producto.descripcion}} {{producto.marca}}</h2>
-                                <p>Precio: {{producto.precio| currency : 'usd' : true : '.0' }}</p>
-                                <ion-note item-end>{{producto.cantidad}}</ion-note>
-                            </ion-card-content>
-  
-                            <ion-fab right bottom>
-                                <button ion-fab mini (tap)="agregar(producto)"><ion-icon name="add"></ion-icon></button>
-                            </ion-fab>
-                          </ion-card>
-                      </ion-col>
-                    </ion-row>
-                  </ion-grid>
-            </ion-scroll>
-          </ion-list>
-      </ion-col>
+          <ion-grid>
+            <ion-row no-padding left>
+              <ion-col col-3 *ngFor="let producto of productos" no-padding left>
+                <ion-card>
+                  <div *ngIf="producto.idproducto">
+                    <img *ngIf="producto.imagen" [src]="producto.imagen" >
+                    <ion-card-content>
+                      <h2>{{producto.descripcion}} {{producto.marca}}</h2>
+                      <p>Precio: {{producto.precio | currency : 'usd' : true : '.0' }}</p>
+                      <ion-note item-end>{{producto.cantidad}}</ion-note>
+                    </ion-card-content>
 
-      <ion-col col-4>
-        <ion-title>
-          Lista de productos
-        </ion-title>
+                    <ion-fab *ngIf="producto.cantidad > 0" right bottom>
+                      <button ion-fab mini (tap)="agregar(producto)"><ion-icon name="add"></ion-icon></button>
+                    </ion-fab>
+                  </div>
+                </ion-card>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </ion-list>
+      </ion-scroll>
+    </ion-col>
 
-        <ion-grid>
-          <ion-row>
+    <ion-col col-4>
+      <ion-title>
+        Lista de productos
+      </ion-title>
+
+      <ion-grid>
+        <ion-row>
+          <ion-col>
+            Producto
+          </ion-col>
+          
+          <ion-col>
+            Cantidad
+          </ion-col>
+
+          <ion-col>
+            Precio
+          </ion-col>
+
+          <ion-col>
+            Subtotal
+          </ion-col>
+
+          <ion-col>
+          </ion-col>
+        </ion-row>
+
+        <ion-list>
+          <ion-row #item *ngFor="let productos of carrito; let i = index">
             <ion-col>
-              Producto
+              {{productos.producto.descripcion}} {{productos.producto.marca}}
             </ion-col>
-            
+
             <ion-col>
-              Cantidad
+              {{productos.cantidad}}
             </ion-col>
 
             <ion-col>
-              Precio
+              {{productos.producto.precio | currency : 'usd' : true : '.0'}}
             </ion-col>
 
             <ion-col>
-              Subtotal
+              {{productos.total | currency : 'usd' : true : '.0'}}
             </ion-col>
 
             <ion-col>
+              <button ion-button color="danger" (click)="borrar(i)">
+                <ion-icon name="trash"></ion-icon>
+              </button>
             </ion-col>
           </ion-row>
 
-          <ion-list>
-            <ion-row #item *ngFor="let productos of carrito; let i = index">
-              <ion-col>
-                {{productos.producto.descripcion}} {{productos.producto.marca}}
-              </ion-col>
+          <ion-row>
+            <ion-col>
+              Total
+            </ion-col>
 
-              <ion-col>
-                {{productos.cantidad}}
-              </ion-col>
+            <ion-col>
+              {{datosVenta.total | currency : 'usd' : true : '.0'}}
+            </ion-col>
+          </ion-row>
+        </ion-list>
+      </ion-grid>
 
-              <ion-col>
-                {{productos.producto.precio | currency : 'usd' : true : '.0'}}
-              </ion-col>
-
-              <ion-col>
-                {{productos.total | currency : 'usd' : true : '.0'}}
-              </ion-col>
-
-              <ion-col>
-                <button ion-button color="danger" (click)="borrar(i)">
-                  <ion-icon name="trash"></ion-icon>
-                </button>
-              </ion-col>
-            </ion-row>
-
-            <ion-row>
-              <ion-col>
-                Total
-              </ion-col>
-
-              <ion-col>
-                {{totalVenta | currency : 'usd' : true : '.0'}}
-              </ion-col>
-            </ion-row>
-          </ion-list>
-        </ion-grid>
-
-        <button ion-button type="submit" block (click)="print()">Finalizar</button>
-        <button ion-button color="danger" block (click)="cancel()">Cancelar</button>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
+      <button ion-button type="submit" block (click)="guardar()">Finalizar</button>
+      <button ion-button color="danger" block (click)="cerrar()">Cancelar</button>
+    </ion-col>
+  </ion-row>
 </ion-content>

@@ -6,84 +6,133 @@
 -->
 <ion-header>
   <ion-navbar>
-    <ion-title>Productos</ion-title>
+    <ion-row>
+      <ion-col>
+        <ion-title>
+          Productos
+        </ion-title>
+      </ion-col>
 
-    <ion-buttons end>
-      <button ion-button icon-only (click)="menu($event)">
-        <ion-icon name="more"></ion-icon>
-      </button>
-    </ion-buttons>
+      <ion-col *ngIf="!busqueda && !filtro" col-3 float-right>
+        <ion-segment [(ngModel)]="modo" (click)="filtrar()" assertive>
+          <ion-segment-button value="uno">
+            <ion-icon name="list"></ion-icon>
+          </ion-segment-button>
+
+          <ion-segment-button value="dos">
+            <ion-icon name="grid"></ion-icon>
+          </ion-segment-button>
+        </ion-segment>
+      </ion-col>
+
+      <ion-col col-1 float-right>
+        <ion-buttons end>
+          <button ion-button icon-only (click)="menu($event)">
+            <ion-icon name="more"></ion-icon>
+          </button>
+        </ion-buttons>
+      </ion-col>
+    </ion-row>
   </ion-navbar>
+
+  <ion-toolbar>
+    <ion-searchbar [(ngModel)]="busqueda" (ionInput)="filtrar()"></ion-searchbar>
+
+    <button ion-button outline (click)="filtrosGrupos()">{{gruposeleccion}}</button>
+    <button ion-button outline (click)="filtrosMarcas()">{{marcaseleccion}}</button>
+  </ion-toolbar>
 </ion-header>
 
 <ion-menu [content]="content">
-    <ion-header>
-      <ion-toolbar>
-        <ion-title>Opciones</ion-title>
-      </ion-toolbar>
-    </ion-header>
+  <ion-header>
+    <ion-toolbar>
+      <ion-title>Opciones</ion-title>
+    </ion-toolbar>
+  </ion-header>
 
-    <ion-content>
-      <ion-list>
-        <button menuClose ion-item *ngFor="let p of pages" (click)="openPage(p)">
-          {{p.title}}
-          <ion-icon name="{{p.icon}}" item-right></ion-icon>
-        </button>
-      </ion-list>
-    </ion-content>
+  <ion-content>
+    <ion-list>
+      <button menuClose ion-item *ngFor="let p of pages" (click)="openPage(p)">
+        {{p.title}}
+        <ion-icon name="{{p.icon}}" item-right></ion-icon>
+      </button>
+    </ion-list>
+  </ion-content>
 </ion-menu>
 
-<ion-content padding>
-  <ion-searchbar [(ngModel)]="busqueda" (ionInput)="productosFiltrados()"></ion-searchbar>
-  
-  <ion-list *ngIf="busqueda">
-      <ion-item-sliding #item *ngFor="let producto of productos">
-        <ion-item (click)="ver(producto)">
-          <ion-thumbnail item-start>
-            <img *ngIf="producto.imagen" [src]="producto.imagen" >
-          </ion-thumbnail>
-          <p>{{producto.descripcion}} {{producto.marca}}</p>
-          <p>Precio: {{producto.precio | currency : 'usd' : true : '.0' }}</p>
-          <ion-note item-end>{{producto.cantidad}}</ion-note>
-        </ion-item>
+<ion-content padding [ngSwitch]="modo">
+  <ion-list *ngIf="busqueda || filtro">
+    <ion-item-sliding #item *ngFor="let producto of productos">
+      <ion-item (click)="ver(producto)">
+        <ion-thumbnail item-start>
+          <img *ngIf="producto.imagen" [src]="producto.imagen">
+        </ion-thumbnail>
+        <p>{{producto.descripcion}} {{producto.marca}}</p>
+        <p>Precio: {{producto.precio | currency : 'usd' : true : '.0' }}</p>
+        <ion-note item-end>{{producto.cantidad}}</ion-note>
+      </ion-item>
 
-        <ion-item-options side="right">
-          <button ion-button color="secondary" (click)="borrarSitio(producto.idproducto)">
-            <ion-icon name="pricetag"></ion-icon>
-          </button>
+      <ion-item-options side="right">
+        <button ion-button large color="secondary" (click)="precio(producto)">
+          <ion-icon name="pricetag"></ion-icon>
+        </button>
+      </ion-item-options>
+    </ion-item-sliding>
+  </ion-list>
 
-          <button ion-button color="danger" (click)="borrarSitio(producto.idproducto)">
-            <ion-icon name="trash"></ion-icon>
-          </button>
-        </ion-item-options>        
-      </ion-item-sliding>
+  <div *ngIf="!busqueda && !filtro">
+    <ion-list *ngSwitchCase="'uno'" >
+      <ion-item-group *ngFor="let item of productos">
+        <ion-item-divider color="light">{{item.grupo}} </ion-item-divider>
+        <ion-item-sliding #item *ngFor="let producto of item.productos">
+          <ion-item (click)="ver(producto)">
+            <ion-thumbnail item-start>
+              <img *ngIf="producto.imagen" [src]="producto.imagen">
+            </ion-thumbnail>
+            <p>{{producto.descripcion}} {{producto.marca}}</p>
+            <p>Precio: {{producto.precio| currency : 'usd' : true : '.0' }}</p>
+            <ion-note item-end>{{producto.cantidad}}</ion-note>
+          </ion-item>
+
+          <ion-item-options side="right">
+            <button ion-button large color="secondary" (click)="precio(producto)">
+              <ion-icon name="pricetag"></ion-icon>
+            </button>
+          </ion-item-options>
+        </ion-item-sliding>
+      </ion-item-group>
     </ion-list>
 
-  <ion-list *ngIf="!busqueda">
-    <ion-item-group *ngFor="let item of productos">
-      <ion-item-divider color="light">{{item.grupo}} </ion-item-divider>
-      <ion-item-sliding #item *ngFor="let producto of item.productos">
-        <ion-item (click)="ver(producto)">
-          <ion-thumbnail item-start>
-            <img *ngIf="producto.imagen" [src]="producto.imagen" >
-          </ion-thumbnail>
-          <p>{{producto.descripcion}} {{producto.marca}}</p>
-          <p>Precio: {{producto.precio| currency : 'usd' : true : '.0' }}</p>
-          <ion-note item-end>{{producto.cantidad}}</ion-note>
-        </ion-item>
+    <ion-list *ngSwitchCase="'dos'">
+      <ion-item-group *ngFor="let grupo of productos">
+        <ion-item-divider color="light">{{grupo.grupo}} </ion-item-divider>
+          <ion-grid>
+            <ion-row *ngFor="let fila of grupo.filas">
+              <ion-col #item *ngFor="let producto of fila">
+                <ion-card *ngIf="producto.idproducto">
+                  <img *ngIf="producto.imagen" [src]="producto.imagen" (click)="ver(producto)">
+                  
+                  <ion-card-content (click)="ver(producto)">
+                    <h2>{{producto.descripcion}} {{producto.marca}}</h2>
+                    <p>Precio: {{producto.precio| currency : 'usd' : true : '.0' }}</p>
+                    <ion-note item-end>{{producto.cantidad}}</ion-note>
+                  </ion-card-content>
 
-        <ion-item-options side="right">
-          <button ion-button color="secondary" (click)="borrarSitio(producto.idproducto)">
-            <ion-icon name="pricetag"></ion-icon>
-          </button>
-
-          <button ion-button color="danger" (click)="borrarSitio(producto.idproducto)">
-            <ion-icon name="trash"></ion-icon>
-          </button>
-        </ion-item-options>        
-      </ion-item-sliding>
-    </ion-item-group>
-  </ion-list>
+                  <ion-row>
+                    <ion-col>
+                      <button ion-button icon-left clear small color="secondary" (click)="precio(producto)">
+                      <ion-icon name="pricetag"></ion-icon>
+                      Precio
+                    </button>
+                  </ion-col>
+                </ion-row>
+              </ion-card>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-item-group>
+    </ion-list>
+  </div>
 
   <ion-fab center bottom>
     <button ion-fab (tap)="agregar()"><ion-icon name="add"></ion-icon></button>

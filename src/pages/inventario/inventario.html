@@ -5,108 +5,57 @@
   Ionic pages and navigation.
 -->
 <ion-header>
+    
+      <ion-navbar>
+        <ion-title>Inventario</ion-title>
+    
+        <ion-toolbar>
+          <ion-segment [(ngModel)]="modo" assertive>
+            <ion-segment-button value="uno">
+              Ingresar por producto
+            </ion-segment-button>
+            <ion-segment-button value="dos">
+              Ingresar por cantidad
+            </ion-segment-button>
+          </ion-segment>
+        </ion-toolbar>
+      </ion-navbar>
+    
+    </ion-header>
+    
+    
+    <ion-content padding>
+      <ion-card>
+        <ion-card-content>
+          <ion-item>
+            <ion-input type="number" placeholder="Códido del producto" [(ngModel)]="idproducto"></ion-input>
+            <button ion-button item-end small>
+              <ion-icon name="arrow-forward" (click)="seleccionar(true)"></ion-icon>
+            </button>
+          </ion-item>
 
-  <ion-navbar>
-    <ion-title>Inventario</ion-title>
+          <ion-item *ngIf="modo == 'dos'">
+            <ion-label floating>Cantidad:</ion-label>
+            <ion-input type="number" [(ngModel)]="inventario.cantidadIngreso"></ion-input>
+          </ion-item>
 
-    <ion-toolbar>
-      <ion-segment [(ngModel)]="modo" assertive>
-        <ion-segment-button value="uno">
-          Ingresar por producto
-        </ion-segment-button>
-        <ion-segment-button value="dos">
-          Ingresar por cantidad
-        </ion-segment-button>
-        <ion-segment-button value="tres">
-          Histórico inventario
-        </ion-segment-button>
-      </ion-segment>
-    </ion-toolbar>
-  </ion-navbar>
-
-</ion-header>
-
-
-<ion-content padding>
-  <ion-card [ngSwitch]="modo">
-    <ion-card-content *ngSwitchCase="'uno'">
-        <ion-item>
-          <ion-label floating>Código:</ion-label>
-          <ion-input type="number" [(ngModel)]="inventario.idproducto" (change)="getProducto(true)"></ion-input>
-        </ion-item>
-
-        <ion-item>
-          <ion-label floating>Producto:</ion-label>
-          <ion-input type="text" [(ngModel)]="producto.descripcion" disabled="true"></ion-input>
-        </ion-item>
-
-        <ion-item>
-          <ion-label floating>Marca:</ion-label>
-          <ion-input type="text" [(ngModel)]="producto.marca" disabled="true"></ion-input>
-        </ion-item>
-
-        <ion-item>
-          <ion-label floating>Grupo:</ion-label>
-          <ion-input type="text" [(ngModel)]="producto.grupo" disabled="true"></ion-input>
-        </ion-item>
-
-        <ion-item>
-          <ion-label floating>Alerta:</ion-label>
-          <ion-input type="number" [(ngModel)]="producto.alerta" disabled="true"></ion-input>
-        </ion-item>
-
-        <ion-item>
-          <ion-label floating>Precio:</ion-label>
-          <ion-input type="number" [(ngModel)]="producto.precio" disabled="true"></ion-input>
-        </ion-item>
-
-        <ion-item>
-          <img [src]="imagen" *ngIf="imagen" />
-        </ion-item>
-    </ion-card-content>
-
-    <ion-card-content *ngSwitchCase="'dos'">
-        <ion-item>
-          <ion-label floating>Código:</ion-label>
-          <ion-input type="number" [(ngModel)]="inventario.idproducto" (change)="getProducto(true)"></ion-input>
-        </ion-item>
-
-        <ion-item>
-          <ion-label floating>Cantidad:</ion-label>
-          <ion-input type="number" [(ngModel)]="inventario.cantidad"></ion-input>
-        </ion-item>
-
-        <ion-item>
-          <ion-label floating>Producto:</ion-label>
-          <ion-input type="text" [(ngModel)]="producto.descripcion" disabled="true"></ion-input>
-        </ion-item>
-
-        <ion-item>
-          <ion-label floating>Marca:</ion-label>
-          <ion-input type="text" [(ngModel)]="producto.marca" disabled="true"></ion-input>
-        </ion-item>
-
-        <ion-item>
-          <ion-label floating>Grupo:</ion-label>
-          <ion-input type="text" [(ngModel)]="producto.grupo" disabled="true"></ion-input>
-        </ion-item>
-
-        <ion-item>
-          <ion-label floating>Alerta:</ion-label>
-          <ion-input type="number" [(ngModel)]="producto.alerta" disabled="true"></ion-input>
-        </ion-item>
-
-        <ion-item>
-          <ion-label floating>Precio:</ion-label>
-          <ion-input type="number" [(ngModel)]="producto.precio" disabled="true"></ion-input>
-        </ion-item>
-
-        <ion-item>
-          <img [src]="imagen" *ngIf="imagen" />
-        </ion-item>
-    </ion-card-content>
-
-    <button *ngIf="(modo == 'uno' || (modo == 'dos' && inventario.cantidad != null && inventario.cantidad != 0)) && producto.idproducto != null && producto.idproducto != 0" ion-button type="submit" block>Agregar al inventario</button>
-  </ion-card>
-
-</ion-content>
+          <ion-item *ngIf="inventario.idproducto">
+            <ion-label floating>Costo:</ion-label>
+            <ion-input type="number" [(ngModel)]="inventario.costo"></ion-input>
+          </ion-item>
+  
+          <ion-item *ngIf="inventario.idproducto">
+            <img *ngIf="inventario.imagen" [src]="inventario.imagen">
+            <p>{{inventario.descripcion}} {{inventario.marca}} {{inventario.grupo}}</p>
+            <p>Precio: {{inventario.precio| currency : 'usd' : true : '.0' }}</p>
+            <ion-note item-end>{{inventario.cantidad}}</ion-note>
+          </ion-item>
+  
+          <button ion-button type="submit" icon-right full large color="secondary" [disabled]="!inventario.idproducto && !inventario.cantidad" (click)="guardar()">Agregar al inventario
+            <ion-icon name="arrow-round-up"></ion-icon>
+          </button>
+        </ion-card-content>
+      </ion-card>
+    
+    </ion-content>
+    

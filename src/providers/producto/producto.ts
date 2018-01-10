@@ -14,20 +14,20 @@ export class ProductoProvider {
   constructor(public db: DbProvider) {
   }
 
-  getProductosFiltrado(filtro){
+  getProductosFiltrado(filtro, campo: string){
     return this.getProductos().then(productos => {
       return Promise.resolve(productos.filter((item) => {
-        return item.descripcion.toLowerCase().indexOf(filtro.toLowerCase()) > -1;
+        return item[campo].toLowerCase().indexOf(filtro.toLowerCase()) > -1;
       }));
     }).catch(err => Promise.reject(err));
   }
 
-  getProductosGrupedColumnas(columnas){
+  getProductosGroupedColumnas(columnas){
     let productos = [];
     return this.getProductosGruopedGrupo().then(grupos => {
-      let productosFila = [];
       let fila = -1;
       for(let grupo of grupos){
+        let productosFila = [];
         grupo.productos.forEach((producto, index) => {
           if(index == 0 || index % columnas == 0){
             fila++;
@@ -49,7 +49,7 @@ export class ProductoProvider {
   getProductosGruopedGrupo(){
     let grupos = [];
     return this.getProductos()
-    .then((productos) => {
+    .then(productos => {
       for(let producto of productos){
         let grupo = producto.grupo;
       
@@ -66,25 +66,22 @@ export class ProductoProvider {
     .catch(err => Promise.reject(err));
   }
 
-  getProductoById(idproducto): any{
-    let items = [];
-    let sql = 'select p.idproducto, p.descripcion, p.marca, p.grupo, p.alerta, p.imagen, p.cantidad, p.activo, pp.precio from productos p inner join producto_precio pp on p.idproducto = pp.idproducto and pp.activo = 1 where p.idproducto = ? ';
-    this.db.ejecutar(sql, [idproducto]).then((res) => {
-      res.forEach(producto => {
-        items.push(producto);
-      });
-    }, (err) => {
-      alert('error al obtener datos ' + err);
-    });
-
-    return items[0];
+  getProductoById(idproducto){
+    let sql = 'select p.idproducto, p.descripcion, p.marca, p.grupo, p.alerta, p.imagen, p.cantidad, p.activo, pp.idprecio, pp.precio from producto p inner join producto_precio pp on p.idproducto = pp.idproducto and pp.activo = ? where p.idproducto = ? ';
+    return this.db.ejecutar(sql, [true, idproducto]).
+    then((res) => {
+      for(var i = 0; i < res.rows.length; i++){
+        return Promise.resolve(res.rows.item(i));
+      }
+      return Promise.resolve(null);
+    }).catch(err => Promise.reject(err));
   }
 
   getProductos(){
-    let sql = 'select p.idproducto, p.descripcion, p.marca, p.grupo, p.alerta, p.imagen, p.cantidad, p.activo, pp.precio from producto p inner join producto_precio pp on p.idproducto = pp.idproducto';
+    let sql = 'select p.idproducto, p.descripcion, p.marca, p.grupo, p.alerta, p.imagen, p.cantidad, p.activo, pp.idprecio, pp.precio from producto p inner join producto_precio pp on p.idproducto = pp.idproducto and p.activo = ? and pp.activo = ? order by p.grupo';
     
     let items = [];
-    return this.db.ejecutar(sql, {})
+    return this.db.ejecutar(sql, [true, true])
     .then((res) => {
       for(var i = 0; i < res.rows.length; i++){
         items.push(res.rows.item(i));
@@ -94,50 +91,93 @@ export class ProductoProvider {
     .catch(err => Promise.reject(err));
   }
 
-  getGrupos(): Array<String>{
+  getGrupos(){
     let items = [];
-    let sql = 'select p.grupo from productos group by p.grupo';
-    this.db.ejecutar(sql, {}).then((res) => {
-      res.rows.forEach(grupo => {
-        items.push(grupo.grupo);
-      });
-    }, (err) => {
-      alert('error al obtener datos ' + err);
-    });
-
-    return items;
+    let sql = 'select p.grupo from producto p group by p.grupo';
+    return this.db.ejecutar(sql, {}).then((res) => {
+      for(var i = 0; i < res.rows.length; i++) {
+        items.push(res.rows.item(i).grupo);
+      }
+      return Promise.resolve(items);
+    }).catch(err => Promise.reject(err));
   }
 
-  getMarcas(): Array<String>{
-    let items = [];
-    let sql = 'select p.marca from productos group by p.marca';
-    this.db.ejecutar(sql, {}).then((res) => {
-      res.rows.forEach(marca => {
-        items.push(marca.marca);
-      });
-    }, (err) => {
-      alert('error al obtener datos ' + err);
-    });
+  getGruposFiltrado(filtro){
+    return this.getGrupos().then(grupos => {
+      return Promise.resolve(grupos.filter((grupo) => {
+        return grupo.toLowerCase().indexOf(filtro.toLowerCase()) > -1;
+      }));
+    }).catch(err => Promise.reject(err));
+  }
 
-    return items;
+  getMarcas(){
+    let items = [];
+    let sql = 'select p.marca from producto p group by p.marca';
+    return this.db.ejecutar(sql, {}).then((res) => {
+      for(var i = 0; i < res.rows.length; i++) {
+        items.push(res.rows.item(i).marca);
+      }
+      return Promise.resolve(items);
+    }).catch(err => Promise.reject(err));
+  }
+
+  getMarcasFiltrado(filtro){
+    return this.getMarcas().then(marcas => {
+      return Promise.resolve(marcas.filter((marca) => {
+        return marca.toLowerCase().indexOf(filtro.toLowerCase()) > -1;
+      }));
+    }).catch(err => Promise.reject(err));
+  }
+
+  existsProducto(producto){
+    let sql = 'select p.idproducto from producto p left join inventario i on i.idproducto = p.idproducto and p.idproducto = ? where (p.idproducto = ? and p.cantidad > 0) or i.idproducto not null limit 1';
+    
+    return this.db.ejecutar(sql, [producto.idproducto, producto.idproducto])
+    .then((res) => {
+      for(var i = 0; i < res.rows.length; i++){
+        return Promise.resolve(true);
+      }
+      return Promise.resolve(false);
+    })
+    .catch(err => Promise.reject(err));
   }
 
   create(producto){
-    let sql = "insert into producto(idproducto, descripcion, marca, grupo, alerta, imagen, cantidad, activo) " +
-    "values (?, ?, ?, ?, ?, ?, ?, ?)";
-    this.db.ejecutar(sql, [producto.idproducto, producto.descripcion, producto.marca, producto.grupo, producto.alerta, producto.imagen, 0, true])
-    .then((res)=>{
-      sql = "insert into producto_precio(idproducto, precio, descuento, fecha, activo) " +
-      "values (?, ?, ?, ?, ?)";
-      this.db.ejecutar(sql, [producto.idproducto, producto.precio, 0, new Date(), true])
-      .then((res) =>{
-        alert("Producto creado");
-      }, (err) => {
-        alert('error al crear precio' + err);
-      });
-    }, (err) => {
-      alert('error al crear producto' + err);
-    });
+    return this.db.db.transaction(transaction => {
+      let sql = "insert into producto (idproducto, descripcion, marca, grupo, alerta, imagen, cantidad, activo) " +
+      "values (?, ?, ?, ?, ?, ?, ?, ?)";
+      transaction.executeSql(sql, [producto.idproducto, producto.descripcion, producto.marca, producto.grupo, producto.alerta, producto.imagen, 0, producto.activo]);
+      
+      sql = "insert into producto_precio(idproducto, precio, descuento, fecha, fechaFin, activo) " +
+      "values (?, ?, ?, ?, ?, ?)";
+
+      transaction.executeSql(sql, [producto.idproducto, producto.precio, 0, new Date(), null, true]);
+    }).then(res => {
+      return Promise.resolve();
+    }).catch(err => Promise.reject(err));
   }
 
+  update(producto){
+    let sql = "update producto set descripcion = ?, marca = ?, grupo = ?, alerta = ?, imagen = ?, activo = ? " +
+    " where idproducto = ?";
+    return this.db.ejecutar(sql, [producto.descripcion, producto.marca, producto.grupo, producto.alerta, producto.imagen, producto.activo, producto.idproducto])
+    .then(res => {
+      return Promise.resolve();
+    }).catch(err => Promise.reject);
+  }
+
+  delete(producto){
+    return this.db.db.transaction(transaction => {
+      let sql = "delete from producto_precio " +
+      " where idproducto = ?";
+      transaction.executeSql(sql, [producto.idproducto]);
+      
+      sql = "delete from producto " +
+      " where idproducto = ?";
+
+      transaction.executeSql(sql, [producto.idproducto]);
+    }).then(res => {
+      return Promise.resolve();
+    }).catch(err => Promise.reject(err));
+  }
 }

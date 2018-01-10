@@ -1,0 +1,30 @@
+<!--
+  Generated template for the PagosPage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+  <ion-navbar>
+    <ion-title>Pago
+    </ion-title>
+  </ion-navbar>
+  
+  <ion-toolbar>    
+    <ion-item>
+      <ion-label>Identificación cliente</ion-label>
+      <ion-input type="number" [(ngModel)]="idpersona"></ion-input>
+    </ion-item>
+    
+    <button *ngIf="idpersona && producto && !datosDevolucion.tipo" ion-button icon-right small full (click)="seleccionar()">
+      <ion-icon name="arrow-forward"></ion-icon>
+    </button>
+
+    <ion-searchbar [(ngModel)]="busqueda" (ionInput)="filtrar()"></ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+
+
+<ion-content padding>
+
+</ion-content>

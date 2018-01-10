@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, ModalController } from 'ionic-angular';
-import { Persona } from '../../providers/persona/persona-class';
 
 /**
  * Generated class for the DetalleUsuarioPage page.
@@ -26,7 +25,7 @@ export class DetalleUsuarioPage {
   }
 
   ver(){
-    let vistaDetalle = this.modalCtrl.create('DetallePersonaPage',{ persona: new Persona(null, null, null, null)});
+    let vistaDetalle = this.modalCtrl.create('DetallePersonaPage');
     vistaDetalle.onDidDismiss(data => {
       this.datosUsuario.idpersona = data;
     });

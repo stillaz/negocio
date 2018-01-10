@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
 import 'rxjs/add/operator/map';
+import { DbProvider } from '../db/db';
 
 /*
   Generated class for the InventarioProvider provider.
@@ -11,8 +11,22 @@ import 'rxjs/add/operator/map';
 @Injectable()
 export class InventarioProvider {
 
-  constructor(public http: Http) {
-    console.log('Hello InventarioProvider Provider');
+  constructor(public db: DbProvider) {
+  }
+
+  create(inventario){
+    return this.db.db.transaction(transaction => {
+      let sql = "insert into inventario (idproducto, fecha, idusuario, cantidad, costo) " + 
+      "values (?, ?, ?, ?, ?) "
+
+      transaction.executeSql(sql, [inventario.idproducto, new Date(), 0, inventario.cantidadIngreso, inventario.costo]);
+
+      sql = "update producto " +
+      "set cantidad = ? where idproducto = ?";
+      transaction.executeSql(sql, [inventario.cantidad, inventario.idproducto]);
+    }).then(res => {
+      return Promise.resolve();
+    }).catch(err => Promise.reject(err));
   }
 
 }

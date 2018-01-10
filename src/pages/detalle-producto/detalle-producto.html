@@ -7,7 +7,7 @@
 <ion-header>
 
   <ion-navbar>
-    <ion-title>Datos de producto {{producto.descripcion}}</ion-title>
+    <ion-title>Datos del producto {{producto.descripcion}}</ion-title>
     <ion-buttons start>
       <button ion-button (click)="cerrar()">
         <ion-icon name="md-close"></ion-icon>
@@ -21,44 +21,81 @@
 <ion-content padding>
   <ion-card>
     <ion-card-content>
-        <ion-item>
-          <ion-label floating>Código:</ion-label>
-          <ion-input type="number" [(ngModel)]="datosProducto.idproducto"></ion-input>
-        </ion-item>
+        <form [formGroup]="todo">
+          <ion-item>
+            <ion-label floating>Código:</ion-label>
+            <ion-input type="number" formControlName="idproducto" [disabled]="!nuevo"></ion-input>
+          </ion-item>
 
-        <ion-item>
-          <ion-label floating>Producto:</ion-label>
-          <ion-input type="text" [(ngModel)]="datosProducto.descripcion"></ion-input>
-        </ion-item>
+          <div *ngIf="todo.controls.idproducto.errors && todo.controls.idproducto.touched">
+            <ion-item *ngIf="todo.controls.idproducto.errors.required">
+              <p>El código del producto no es válido</p>
+            </ion-item>
 
-        <ion-item>
-          <ion-label floating>Marca:</ion-label>
-          <ion-input type="text" [(ngModel)]="datosProducto.marca"></ion-input>
-        </ion-item>
+            <ion-item color="danger" *ngIf="todo.controls.idproducto.errors.valorUnico">
+              <p>El código ingresado ya existe</p>
+            </ion-item> 
+          </div>
 
-        <ion-item>
-          <ion-label floating>Grupo:</ion-label>
-          <ion-input type="text" [(ngModel)]="datosProducto.grupo"></ion-input>
-        </ion-item>
+          <ion-item>
+            <ion-label floating>Producto:</ion-label>
+            <ion-input type="text" formControlName="descripcion" maxlength="30"></ion-input>
+          </ion-item>
 
-        <ion-item>
-          <ion-label floating>Alerta:</ion-label>
-          <ion-input type="number" [(ngModel)]="datosProducto.alerta"></ion-input>
-        </ion-item>
+          <ion-item color="danger" *ngIf="todo.controls.descripcion.errors && todo.controls.descripcion.touched">
+            <p>La descripción del producto no es válida</p>
+          </ion-item>
 
-        <ion-item>
-          <ion-label floating>Precio:</ion-label>
-          <ion-input type="number" [(ngModel)]="datosProducto.precio"></ion-input>
-        </ion-item>
+          <ion-item (click)="menu('Marcas')">
+            <ion-label floating>Marca:</ion-label>
+            <ion-input type="text" disabled="true" formControlName="marca"></ion-input>
+          </ion-item>
 
-        <ion-item>
-          <img [src]="datosProducto.imagen" *ngIf="datosProducto.imagen" />
-          <button ion-button icon-left full type="button" (tap)="sacarFoto()">
-            Foto&nbsp;&nbsp;
-            <ion-icon name="camera"></ion-icon>
+          <ion-item color="danger" *ngIf="todo.controls.marca.errors && todo.controls.marca.touched">
+            <p>La marca del producto no es válida</p>
+          </ion-item>
+
+          <ion-item (click)="menu('Grupos')">
+            <ion-label floating>Grupo:</ion-label>
+            <ion-input type="text" disabled="true" formControlName="grupo"></ion-input>
+          </ion-item>
+
+          <ion-item color="danger" *ngIf="todo.controls.grupo.errors && todo.controls.grupo.touched">
+            <p>El grupo del producto no es válido</p>
+          </ion-item>
+
+          <ion-item>
+            <ion-label floating>Alerta:</ion-label>
+            <ion-input type="number" formControlName="alerta"></ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label floating>Precio:</ion-label>
+            <ion-input type="number" formControlName="precio" [disabled]="!nuevo"></ion-input>
+          </ion-item>
+
+          <ion-item color="danger" *ngIf="todo.controls.precio.errors && todo.controls.precio.touched">
+            <p>El precio del producto no es válido</p>
+          </ion-item>
+
+          <ion-item>
+            <div text-center>
+              <img [src]="todo.controls.imagen.value" *ngIf="todo.controls.imagen.value" />
+              <button center ion-button icon-only outline round large color="dark" type="button" (tap)="sacarFoto()">
+                <ion-icon name="camera"></ion-icon>
+              </button>
+            </div>
+          </ion-item>
+  
+          <button ion-button type="submit" icon-right full large color="secondary" [disabled]="todo.invalid" (click)="guardar()">Guardar
+            <ion-icon name="checkmark"></ion-icon>
           </button>
-        </ion-item>
-        <button ion-button type="submit" block (click)="guardar()">Guardar</button>
+
+          <button *ngIf="!nuevo" ion-button icon-right full large color="danger" (click)="eliminar()">Eliminar
+            <ion-icon name="trash"></ion-icon>
+          </button>
+        </form>
     </ion-card-content>
   </ion-card>
 </ion-content>
+
