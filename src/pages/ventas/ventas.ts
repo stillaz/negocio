@@ -20,6 +20,7 @@ export class VentasPage {
   ventas;
   total: number;
   fechaCaja: Date;
+  cierre: boolean;
 
   pages: any[] = [
     { title: 'Historial de ventas', component: 'ListaVentasPage', icon: 'stats' }
@@ -28,7 +29,7 @@ export class VentasPage {
   constructor(public navCtrl: NavController, public navParams: NavParams, public venta: VentaProvider, public popoverCtrl: PopoverController, private cajaService: CajaProvider, public alertCtrl: AlertController, public events: Events) {
   }
 
-  ionViewDidLoad(){
+  ionViewDidLoad() {
     this.fechaCaja = new Date();
     this.getVentas();
   }
@@ -42,12 +43,16 @@ export class VentasPage {
   }
 
   getVentas() {
+    this.cierre = false;
     this.total = 0;
     let inicial = moment(this.fechaCaja).startOf('day');
     let final = moment(this.fechaCaja).endOf('day');
     this.venta.getVentasByUsuarioFecha(inicial.toDate(), final.toDate()).then(ventas => {
       ventas.forEach(venta => {
-        this.total = (venta.total < venta.pago) ? Number(this.total) + (Number(venta.pago) - Number(venta.devuelta)) : Number(this.total) + Number(venta.pago);
+        this.total = (Number(venta.total) < Number(venta.pago)) ? Number(this.total) + (Number(venta.pago) - Number(venta.devuelta)) : Number(this.total) + Number(venta.pago);
+        if (!this.cierre) {
+          this.cierre = venta.cerrada !== "true";
+        }
       });
       this.ventas = ventas;
     }).catch(err => alert("Error cargando ventas"));
@@ -111,6 +116,7 @@ export class VentasPage {
             let mensaje = caja.diferencia === 0 ? "" : caja.diferencia > 0 ? "La caja tiene un valor superior de " + diferenciaText : "La caja tiene un valor negativo de " + diferenciaText;
             if (mensaje === "") {
               this.cajaService.create(caja);
+              prompt.dismiss();
             } else {
               let alert = this.alertCtrl.create({
                 title: 'Caja descuadrada',
@@ -120,6 +126,7 @@ export class VentasPage {
                   text: 'Si',
                   handler: () => {
                     this.cajaService.create(caja);
+                    prompt.dismiss();
                   },
                 },
                 {
@@ -129,6 +136,9 @@ export class VentasPage {
               });
               alert.present();
             }
+            prompt.onDidDismiss(data => {
+              this.getVentas();
+            });
           }
         }
       ]

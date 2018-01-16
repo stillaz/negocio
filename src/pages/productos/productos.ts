@@ -129,7 +129,8 @@ export class ProductosPage {
       }
       let actionSheet = this.actionSheetCtrl.create({
         title: 'Grupos',
-        buttons: filtros
+        buttons: filtros,
+        cssClass: 'actionSheet1'
       });
       actionSheet.present();
     });

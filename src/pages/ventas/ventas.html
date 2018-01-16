@@ -10,7 +10,7 @@
   </ion-navbar>
   <h3>Total recibido: {{total| currency : 'usd' : true : '.0'}}</h3>
 
-  <button *ngIf="ventas.length > 0" ion-button type="submit" icon-right full outline color="secondary" (click)="alertaCerrarCaja()">Cerrar caja
+  <button *ngIf="cierre" ion-button type="submit" icon-right full outline color="secondary" (click)="alertaCerrarCaja()">Cerrar caja
     <ion-icon name="checkmark"></ion-icon>
   </button>
 </ion-header>
